@@ -7,11 +7,10 @@ bp = Blueprint("users", __name__, url_prefix="/users")
 
 def get_user(id):
     db = get_db()
-    user = db.execute(
+    return db.execute(
         "SELECT email, first_name, last_name, image_url FROM users WHERE id = ?",
         (id,),
     ).fetchone()
-    return user
 
 
 @bp.route("/<int:id>", methods=["GET"])
@@ -37,18 +36,13 @@ def edit_user_by_id(id):
     if data is None:
         return jsonify({"error": "Invalid JSON data."}), 400
 
-    allowed_fields = {
-        "email",
-        "password",
-        "first_name",
-        "last_name",
-        "image_url"}
+    allowed_fields = {"email", "password", "first_name", "last_name", "image_url"}
 
     for field in data:
         if field not in allowed_fields:
             return jsonify({"error": "Invalid field."}), 400
 
-    set_clause = ", ".join([f"{field} = ?" for field in data.keys()])
+    set_clause = ", ".join([f"{field} = ?" for field in data])
     values = list(data.values())
 
     try:

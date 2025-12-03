@@ -35,6 +35,7 @@ def test_get_user_by_id(client, app):
             "last_name": "Testowy",
             "image_url": "https://link_to_image.com",
         }
+    return None
 
 
 def test_get_user_by_id_convertion(client):
@@ -70,6 +71,7 @@ def test_edit_user_by_id(client, app):
             .execute("SELECT first_name, last_name FROM users WHERE id = 1")
             .fetchone()
         ) == {"first_name": "Atest", "last_name": "Atestowy"}
+    return None
 
 
 def test_edit_user_by_id_without_data(client):
@@ -87,9 +89,7 @@ def test_edit_user_by_id_with_invalid_data(client):
 
 
 def test_edit_user_by_id_integrity_error(client, monkeypatch):
-    monkeypatch.setattr(
-        "link_sharing_app.users.get_db",
-        lambda: FakeConnection())
+    monkeypatch.setattr("link_sharing_app.users.get_db", lambda: FakeConnection())
 
     response = client.patch(
         "/users/1", json={"first_name": "NewName", "last_name": "NewLastName"}
@@ -117,6 +117,7 @@ def test_delete_user_by_id(client, app):
 
     with app.app_context():
         assert get_db().execute("SELECT * FROM users WHERE id = 1").fetchone() is None
+    return None
 
 
 def test_delete_user_not_found(client):
@@ -126,9 +127,7 @@ def test_delete_user_not_found(client):
 
 
 def test_delete_user_by_id_integrity_error(client, monkeypatch):
-    monkeypatch.setattr(
-        "link_sharing_app.users.get_db",
-        lambda: FakeConnection())
+    monkeypatch.setattr("link_sharing_app.users.get_db", lambda: FakeConnection())
 
     response = client.delete("/users/1")
 

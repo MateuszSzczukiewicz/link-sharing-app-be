@@ -63,9 +63,7 @@ def test_create_link_empty_json(client):
 def test_create_link_missing_user_id(client):
     response = client.post(
         "/links/",
-        json={
-            "platform": "Twitter",
-            "url": "https://twitter.com/some_profile"},
+        json={"platform": "Twitter", "url": "https://twitter.com/some_profile"},
     )
     assert response.status_code == 400
     data = response.get_json()
@@ -74,30 +72,22 @@ def test_create_link_missing_user_id(client):
 
 def test_create_link_missing_platform(client):
     response = client.post(
-        "/links/",
-        json={
-            "user_id": 1,
-            "url": "https://twitter.com/some_profile"})
+        "/links/", json={"user_id": 1, "url": "https://twitter.com/some_profile"}
+    )
     assert response.status_code == 400
     data = response.get_json()
     assert data == {"error": "Platform is required."}
 
 
 def test_create_link_missing_url(client):
-    response = client.post(
-        "/links/",
-        json={
-            "user_id": 1,
-            "platform": "Twitter"})
+    response = client.post("/links/", json={"user_id": 1, "platform": "Twitter"})
     assert response.status_code == 400
     data = response.get_json()
     assert data == {"error": "Url is required."}
 
 
 def test_create_link_integrity_error(client, monkeypatch):
-    monkeypatch.setattr(
-        "link_sharing_app.links.get_db",
-        lambda: FakeConnection())
+    monkeypatch.setattr("link_sharing_app.links.get_db", lambda: FakeConnection())
 
     response = client.post(
         "/links/",
@@ -125,7 +115,8 @@ def test_edit_link_by_id_success(client, app):
     with app.app_context():
         db = get_db()
         link_in_db = dict(
-            db.execute("SELECT platform, url FROM links WHERE id = 1").fetchone())
+            db.execute("SELECT platform, url FROM links WHERE id = 1").fetchone()
+        )
         assert link_in_db["platform"] == "LinkedIn"
         assert link_in_db["url"] == "https://linked.in/new_profile"
 
@@ -152,15 +143,9 @@ def test_edit_link_by_id_invalid_field(client):
 
 
 def test_edit_link_by_id_integrity_error(client, monkeypatch):
-    monkeypatch.setattr(
-        "link_sharing_app.links.get_db",
-        lambda: FakeConnection())
+    monkeypatch.setattr("link_sharing_app.links.get_db", lambda: FakeConnection())
 
-    response = client.patch(
-        "/links/1",
-        json={
-            "platform": "Twitter",
-            "url": "any"})
+    response = client.patch("/links/1", json={"platform": "Twitter", "url": "any"})
     assert response.status_code == 500
     data = response.get_json()
     assert data["error"] == "Database integrity error"
@@ -186,9 +171,7 @@ def test_delete_link_by_id_not_found(client):
 
 
 def test_delete_link_by_id_integrity_error(client, monkeypatch):
-    monkeypatch.setattr(
-        "link_sharing_app.links.get_db",
-        lambda: FakeConnection())
+    monkeypatch.setattr("link_sharing_app.links.get_db", lambda: FakeConnection())
 
     response = client.delete("/links/1")
     assert response.status_code == 500

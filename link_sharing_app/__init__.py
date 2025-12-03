@@ -1,5 +1,5 @@
+import contextlib
 import os
-from typing import Dict, Optional, Tuple
 
 from dotenv import load_dotenv
 from flask import Flask
@@ -9,7 +9,7 @@ from . import auth, db, links, users
 load_dotenv()
 
 
-def create_app(test_config: Optional[Dict[str, bool | str]] = None) -> Flask:
+def create_app(test_config: dict[str, bool | str] | None = None) -> Flask:
     app = Flask(__name__, instance_relative_config=True)
 
     secret_key = os.getenv("SECRET_KEY")
@@ -17,9 +17,8 @@ def create_app(test_config: Optional[Dict[str, bool | str]] = None) -> Flask:
     app.config.from_mapping(
         SECRET_KEY=secret_key,
         DATABASE=f"file:{
-            os.path.join(
-                app.instance_path,
-                'link_sharing_app.sqlite')}?mode=rwc",
+            os.path.join(app.instance_path, 'link_sharing_app.sqlite')
+        }?mode=rwc",
     )
 
     if test_config is None:
@@ -27,10 +26,8 @@ def create_app(test_config: Optional[Dict[str, bool | str]] = None) -> Flask:
     else:
         app.config.from_mapping(test_config)
 
-    try:
+    with contextlib.suppress(OSError):
         os.makedirs(app.instance_path)
-    except OSError:
-        pass
 
     db.init_app(app)
 
@@ -39,7 +36,7 @@ def create_app(test_config: Optional[Dict[str, bool | str]] = None) -> Flask:
     app.register_blueprint(links.bp)
 
     @app.route("/")
-    def health_check() -> Tuple[Dict[str, str], int]:
+    def health_check() -> tuple[dict[str, str], int]:
         return {"status": "ok"}, 200
 
     return app

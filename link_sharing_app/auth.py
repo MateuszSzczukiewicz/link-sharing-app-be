@@ -3,7 +3,7 @@ import os
 
 import jwt
 from dotenv import load_dotenv
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from .db import get_db
@@ -29,7 +29,7 @@ def register():
 
     if not email:
         return jsonify({"error": "Email is required."}), 400
-    elif not password:
+    if not password:
         return jsonify({"error": "Password is required."}), 400
 
     try:
@@ -56,21 +56,20 @@ def login():
     password = data.get("password")
     db = get_db()
 
-    secret_key = os.getenv("SECRET_KEY")
+    secret_key = current_app.config.get("SECRET_KEY") or os.getenv("SECRET_KEY")
     if not secret_key:
         raise ValueError("No secret key set.")
 
     if not email:
         return jsonify({"error": "Email is required."}), 400
-    elif not password:
+    if not password:
         return jsonify({"error": "Password is required."}), 400
 
-    user = db.execute("SELECT * FROM users WHERE email = ?",
-                      (email,)).fetchone()
+    user = db.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
 
     if user is None:
         return jsonify({"error": "User is not found."}), 404
-    elif not check_password_hash(user["password"], password):
+    if not check_password_hash(user["password"], password):
         return jsonify({"error": "Incorrect password."}), 401
 
     payload_data = {
@@ -80,5 +79,4 @@ def login():
 
     token = jwt.encode(payload=payload_data, key=secret_key)
 
-    return jsonify(
-        {"message": "User logged in successfully.", "token": token}), 200
+    return jsonify({"message": "User logged in successfully.", "token": token}), 200

@@ -8,11 +8,10 @@ bp = Blueprint("links", __name__, url_prefix="/links")
 
 def get_link(id):
     db = get_db()
-    link = db.execute(
+    return db.execute(
         "SELECT * FROM links WHERE id = ?",
         (id,),
     ).fetchone()
-    return link
 
 
 @bp.route("/<int:user_id>", methods=["GET"])
@@ -28,8 +27,7 @@ def get_all_links(user_id):
         (user_id,),
     ).fetchall()
 
-    return jsonify({"data": [dict(row)
-                   for row in links], "message": "Success."}), 200
+    return jsonify({"data": [dict(row) for row in links], "message": "Success."}), 200
 
 
 @bp.route("/", methods=["POST"])
@@ -49,9 +47,9 @@ def create_link():
 
     if not user_id:
         return jsonify({"error": "User_id is required."}), 400
-    elif not platform:
+    if not platform:
         return jsonify({"error": "Platform is required."}), 400
-    elif not url:
+    if not url:
         return jsonify({"error": "Url is required."}), 400
 
     try:
@@ -84,7 +82,7 @@ def edit_link_by_id(id):
         if field not in allowed_fields:
             return jsonify({"error": "Invalid field."}), 400
 
-    set_clause = ", ".join([f"{field} = ?" for field in data.keys()])
+    set_clause = ", ".join([f"{field} = ?" for field in data])
     values = list(data.values())
 
     try:

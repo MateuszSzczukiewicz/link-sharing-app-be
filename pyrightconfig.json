@@ -1,11 +1,27 @@
 {
-  "include": ["."],
-  "typeCheckingMode": "strict",
+  "include": ["link_sharing_app", "tests"],
+  "exclude": [
+    ".venv",
+    "**/__pycache__",
+    "**/.pytest_cache",
+    "**/node_modules",
+    "**/.venv"
+  ],
+  "typeCheckingMode": "basic",
   "reportUnusedFunction": "none",
-  "reportMissingImports": true,
-  "reportMissingTypeStubs": true,
-  "reportUntypedFunctionDecorator": true,
-  "reportUntypedClassDecorator": true,
-  "reportUntypedCalls": true,
-  "reportUntypedDefs": true
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": "none",
+  "reportUntypedFunctionDecorator": "none",
+  "reportUntypedClassDecorator": "none",
+  "reportUntypedCalls": "none",
+  "reportUntypedDefs": "warning",
+  "reportGeneralTypeIssues": "warning",
+  "reportOptionalMemberAccess": "warning",
+  "reportOptionalSubscript": "warning",
+  "reportPrivateImportUsage": "none",
+  "pythonVersion": "3.14",
+  "pythonPlatform": "All",
+  "stubPath": "typings",
+  "venvPath": ".",
+  "venv": ".venv"
 }

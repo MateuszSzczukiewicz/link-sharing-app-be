@@ -23,15 +23,14 @@ class FakeConnection:
         q_upper = query.strip().upper()
         if q_upper.startswith("UPDATE"):
             raise sqlite3.IntegrityError("Simulated IntegrityError on UPDATE")
-        elif q_upper.startswith("DELETE"):
+        if q_upper.startswith("DELETE"):
             raise sqlite3.IntegrityError("Simulated IntegrityError on DELETE")
-        elif q_upper.startswith("INSERT"):
+        if q_upper.startswith("INSERT"):
             if "INTO LINKS" in q_upper:
                 if len(params) >= 2 and params[1] == "Twitter":
-                    raise sqlite3.IntegrityError(
-                        "Simulated IntegrityError on INSERT")
+                    raise sqlite3.IntegrityError("Simulated IntegrityError on INSERT")
             return FakeCursor(None)
-        elif q_upper.startswith("SELECT"):
+        if q_upper.startswith("SELECT"):
             if "FROM USERS" in q_upper and "WHERE ID = ?" in q_upper:
                 fake_user = {
                     "email": "test@gmail.com",
@@ -40,7 +39,7 @@ class FakeConnection:
                     "image_url": "https://link_to_image.com",
                 }
                 return FakeCursor(fake_user)
-            elif "FROM LINKS" in q_upper:
+            if "FROM LINKS" in q_upper:
                 if "WHERE USER_ID = ?" in q_upper:
                     fake_link = {
                         "id": 1,
@@ -50,7 +49,7 @@ class FakeConnection:
                         "created": "2025-03-16 12:00:00",
                     }
                     return FakeCursor([fake_link])
-                elif "WHERE ID = ?" in q_upper:
+                if "WHERE ID = ?" in q_upper:
                     if params[0] == 1:
                         fake_link = {
                             "id": 1,
@@ -60,11 +59,9 @@ class FakeConnection:
                             "created": "2025-03-16 12:00:00",
                         }
                         return FakeCursor(fake_link)
-                    else:
-                        return FakeCursor(None)
+                    return FakeCursor(None)
             return FakeCursor(None)
-        else:
-            return FakeCursor(None)
+        return FakeCursor(None)
 
     def commit(self):
         pass
